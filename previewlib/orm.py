@@ -65,6 +65,12 @@ class _PreviewToken(_PreviewModel):
         condition = (cls.id == ident) & (rel_model.customer == CUSTOMER.id)
         return cls.join(rel_model).select().where(condition).get()
 
+    @classmethod
+    def for_customer(cls):
+        """Returns a token by its ID while checking the customer."""
+        return cls.join(cls.obj.rel_model).select().where(
+            cls.obj.rel_model.customer == CUSTOMER.id)
+
 
 class DeploymentPreviewToken(_PreviewToken):
     """Preview tokens for deployments."""
