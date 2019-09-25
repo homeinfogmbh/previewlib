@@ -2,13 +2,33 @@
 
 from flask import request
 
-from cmslib.messages.preview import INVALID_TOKEN_TYPE
-from cmslib.orm.preview import TOKEN_TYPES
-from his import authenticated, authorized
+from previewlib.messages import INVALID_TOKEN_TYPE
+from previewlib.messages import MISSING_TOKEN_TYPE
+from previewlib.messages import MISSING_IDENTIFIER
+from previewlib.messages import NO_SUCH_TOKEN
+from previewlib.messages import TOKEN_DELETED
+from previewlib.orm import TOKEN_TYPES
+from his import authenticated, authorized, Application
 from wsgilib import JSON
 
 
-__all__ = ['ROUTES']
+__all__ = ['APPLICATION']
+
+
+APPLICATION = Application('preview')
+
+
+@authenticated
+@authorized('preview')
+def list_(type):    # pylint: disable=W0622
+    """Lists the customer's preview tokens."""
+
+    try:
+        token_class = TOKEN_TYPES[type]
+    except KeyError:
+        return INVALID_TOKEN_TYPE
+
+    return JSON([token.to_json() for token in token_class.for_customer()])
 
 
 @authenticated
@@ -27,7 +47,7 @@ def generate():
 
     if not ident:
         return MISSING_IDENTIFIER
-    
+
     try:
         token_class = TOKEN_TYPES[type_]
     except KeyError:
@@ -41,9 +61,9 @@ def generate():
 
 @authenticated
 @authorized('preview')
-def delete(type, ident):
+def delete(type, ident):    # pylint: disable=W0622
     """Deletes a preview token."""
-    
+
     try:
         token_class = TOKEN_TYPES[type]
     except KeyError:
@@ -59,6 +79,7 @@ def delete(type, ident):
 
 
 APPLICATION.add_routes((
+    ('GET', '/token/<type>', list_),
     ('POST', '/token', generate),
-    ('GET', '/token/<type>/<int:ident>', delete)
+    ('DELETE', '/token/<type>/<int:ident>', delete)
 ))
