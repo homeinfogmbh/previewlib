@@ -34,23 +34,29 @@ class _PreviewToken(_PreviewModel):
     obj = None
 
     @classmethod
-    def generate(cls, ident, force=False):
-        """Returns a token for the respective resource."""
+    def _get_rel_record(cls, ident):
+        """Returns a related object by its ID."""
         model = cls.obj.rel_model
+        condition = model.id == ident
+        condition &= model.customer == CUSTOMER.id
 
         try:
-            record = model.get(
-                (model.id == ident) & (model.customer == CUSTOMER.id))
+            return model.get(condition)
         except model.DoesNotExist:
             raise NO_SUCH_OBJECT.update(type=model.__name__)
 
+    @classmethod
+    def generate(cls, ident, force=False):
+        """Returns a token for the respective resource."""
+        rel_record = cls._get_rel_record(ident)
+
         if force:
-            return cls(obj=record)
+            return cls(obj=rel_record)
 
         try:
-            return cls.get(cls.obj == record)
+            return cls.get(cls.obj == rel_record)
         except cls.DoesNotExist:
-            return cls(obj=record)
+            return cls(obj=rel_record)
 
 
 class DeploymentPreviewToken(_PreviewToken):
