@@ -13,20 +13,52 @@ __all__ = ['ROUTES']
 
 @authenticated
 @authorized('preview')
-def generate(name, ident):
+def generate():
     """Generates a preview token of the
     specified type for the provided ID.
     """
 
-    try:
-        token_class = TOKEN_TYPES[name]
-    except KeyError:
-        raise INVALID_TOKEN_TYPE
+    type_ = request.json.get('type')
 
-    force = 'force' in request.args
+    if not type_:
+        return MISSING_TOKEN_TYPE
+
+    ident = request.json.get('id')
+
+    if not ident:
+        return MISSING_IDENTIFIER
+    
+    try:
+        token_class = TOKEN_TYPES[type_]
+    except KeyError:
+        return INVALID_TOKEN_TYPE
+
+    force = request.json.get('force', False)
     token = token_class.generate(ident, force=force)
     token.save()
     return JSON({'token': token.token.hex})
 
 
-ROUTES = (('GET', '/previewgen/<name>/<int:ident>', generate),)
+@authenticated
+@authorized('preview')
+def delete(type, ident):
+    """Deletes a preview token."""
+    
+    try:
+        token_class = TOKEN_TYPES[type]
+    except KeyError:
+        return INVALID_TOKEN_TYPE
+
+    try:
+        token = token_class.by_id(ident)
+    except token_class.DoesNotExist:
+        return NO_SUCH_TOKEN
+
+    token.delete_instance()
+    return TOKEN_DELETED
+
+
+APPLICATION.add_routes((
+    ('POST', '/token', generate),
+    ('GET', '/token/<type>/<int:ident>', delete)
+))

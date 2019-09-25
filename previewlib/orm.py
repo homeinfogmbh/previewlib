@@ -58,6 +58,13 @@ class _PreviewToken(_PreviewModel):
         except cls.DoesNotExist:
             return cls(obj=rel_record)
 
+    @classmethod
+    def by_id(cls, ident):
+        """Returns a token by its ID while checking the customer."""
+        rel_model = cls.obj.rel_model
+        condition = (cls.id == ident) & (rel_model.customer == CUSTOMER.id)
+        return cls.join(rel_model).select().where(condition).get()
+
 
 class DeploymentPreviewToken(_PreviewToken):
     """Preview tokens for deployments."""
@@ -78,7 +85,6 @@ class GroupPreviewToken(_PreviewToken):
     obj = ForeignKeyField(Group, column_name='group', on_delete='CASCADE')
 
 
-MODELS = (DeploymentPreviewToken, GroupPreviewToken)
 TOKEN_TYPES = {
     'deployment': DeploymentPreviewToken,
     'group': GroupPreviewToken
