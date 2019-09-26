@@ -4,6 +4,9 @@ from uuid import UUID
 
 from flask import request
 
+from his import authenticated, authorized, Application
+from wsgilib import JSON
+
 from previewlib.messages import UNAUTHORIZED
 from previewlib.messages import INVALID_TOKEN_TYPE
 from previewlib.messages import MISSING_TOKEN_TYPE
@@ -11,8 +14,6 @@ from previewlib.messages import MISSING_IDENTIFIER
 from previewlib.messages import NO_SUCH_TOKEN
 from previewlib.messages import TOKEN_DELETED
 from previewlib.orm import TOKEN_TYPES, FileAccessToken
-from his import authenticated, authorized, Application
-from wsgilib import JSON
 
 
 __all__ = ['APPLICATION']
@@ -85,13 +86,8 @@ def get_file(sha256sum):
     """Returns a deployment-related file."""
 
     try:
-        token = request.args['token']
-    except KeyError:
-        return UNAUTHORIZED
-
-    try:
-        token = UUID(token)
-    except ValueError:
+        token = UUID(request.args['token'])
+    except (KeyError, ValueError):
         return UNAUTHORIZED
 
     return FileAccessToken.request(token, sha256sum)
@@ -101,5 +97,5 @@ APPLICATION.add_routes((
     ('GET', '/token/<type>', list_),
     ('POST', '/token', generate),
     ('DELETE', '/token/<type>/<int:ident>', delete),
-    ('GET', '/file/<sha256sum>', delete)
+    ('GET', '/file/<sha256sum>', get_file)
 ))
