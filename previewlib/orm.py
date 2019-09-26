@@ -155,9 +155,9 @@ class FileAccessToken(_PreviewModel):
         return cls.headers_for_sha256sums(sha256sums)
 
     @classmethod
-    def request(cls, sha256sum, token):
+    def request(cls, token, sha256sum):
         """Requests the file with the respective ID and token."""
-        condition = (cls.sha256sum == sha256sum) & (cls.token == token)
+        condition = (cls.token == token) & (cls.sha256sum == sha256sum)
 
         try:
             record = cls.get(condition)

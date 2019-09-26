@@ -1,13 +1,16 @@
 """WSGI interface."""
 
+from uuid import UUID
+
 from flask import request
 
+from previewlib.messages import UNAUTHORIZED
 from previewlib.messages import INVALID_TOKEN_TYPE
 from previewlib.messages import MISSING_TOKEN_TYPE
 from previewlib.messages import MISSING_IDENTIFIER
 from previewlib.messages import NO_SUCH_TOKEN
 from previewlib.messages import TOKEN_DELETED
-from previewlib.orm import TOKEN_TYPES
+from previewlib.orm import TOKEN_TYPES, FileAccessToken
 from his import authenticated, authorized, Application
 from wsgilib import JSON
 
@@ -78,8 +81,25 @@ def delete(type, ident):    # pylint: disable=W0622
     return TOKEN_DELETED
 
 
+def get_file(sha256sum):
+    """Returns a deployment-related file."""
+
+    try:
+        token = request.args['token']
+    except KeyError:
+        return UNAUTHORIZED
+
+    try:
+        token = UUID(token)
+    except ValueError:
+        return UNAUTHORIZED
+
+    return FileAccessToken.request(token, sha256sum)
+
+
 APPLICATION.add_routes((
     ('GET', '/token/<type>', list_),
     ('POST', '/token', generate),
-    ('DELETE', '/token/<type>/<int:ident>', delete)
+    ('DELETE', '/token/<type>/<int:ident>', delete),
+    ('GET', '/file/<sha256sum>', delete)
 ))
