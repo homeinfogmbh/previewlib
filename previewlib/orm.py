@@ -140,20 +140,12 @@ class FileAccessToken(_PreviewModel):
         return token
 
     @classmethod
-    def headers_for_sha256sums(cls, sha256sums):
-        """Adds entries for respective SHA-256
-        checksums and returns a response headers.
-        """
-        token = cls.token_for_sha256sums(sha256sums)
-        return {'file-access-token': token.hex}
-
-    @classmethod
-    def headers_for_presentation(cls, presentation):
+    def token_for_presentation(cls, presentation):
         """Returns a response headers for the
         respective presentation object.
         """
         sha256sums = {File[file].sha256sum for file in presentation.files}
-        return cls.headers_for_sha256sums(sha256sums)
+        return cls.token_for_sha256sums(sha256sums)
 
     @classmethod
     def request(cls, token, sha256sum):
