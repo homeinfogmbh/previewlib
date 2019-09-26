@@ -6,8 +6,9 @@ from uuid import uuid4
 from peewee import DateTimeField, FixedCharField, ForeignKeyField, UUIDField
 
 from cmslib.orm.group import Group
-from filedb import FileError, get, sha256sum
+from filedb import FileError, get
 from his import CUSTOMER
+from hisfs import File
 from peeweeplus import JSONModel, MySQLDatabase
 from terminallib import Deployment
 
@@ -151,7 +152,7 @@ class FileAccessToken(_PreviewModel):
         """Returns a response headers for the
         respective presentation object.
         """
-        sha256sums = {sha256sum(file) for file in presentation.files}
+        sha256sums = {File[file].sha256sum for file in presentation.files}
         return cls.headers_for_sha256sums(sha256sums)
 
     @classmethod
