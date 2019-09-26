@@ -145,7 +145,7 @@ class FileAccessToken(_PreviewModel):
         checksums and returns a response headers.
         """
         token = cls.token_for_sha256sums(sha256sums)
-        return {'fileAccressToken': token.hex}
+        return {'file-access-token': token.hex}
 
     @classmethod
     def headers_for_presentation(cls, presentation):
