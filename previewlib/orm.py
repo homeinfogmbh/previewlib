@@ -13,7 +13,7 @@ from peeweeplus import JSONModel, MySQLDatabase
 from terminallib import Deployment
 
 from previewlib.config import CONFIG
-from previewlib.messages import NO_SUCH_OBJECT, NO_SUCH_FILE, FILEDB_ERROR
+from previewlib.messages import FILEDB_ERROR, NO_SUCH_OBJECT, UNAUTHORIZED
 
 
 __all__ = [
@@ -155,15 +155,15 @@ class FileAccessToken(_PreviewModel):
         try:
             record = cls.get(condition)
         except cls.DoesNotExist:
-            raise NO_SUCH_FILE
+            raise UNAUTHORIZED
 
         now = datetime.now()
 
         if record.valid_until < now:
-            raise NO_SUCH_FILE
+            raise UNAUTHORIZED
 
         if record.requested_on is not None:
-            raise NO_SUCH_FILE
+            raise UNAUTHORIZED
 
         record.requested_on = now
         record.save()
