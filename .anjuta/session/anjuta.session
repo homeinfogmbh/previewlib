@@ -3,7 +3,7 @@ Maximized=1
 Geometry=1920x983+0+27
 
 [File Loader]
-Files=../../setup.py#16%%%../../previewlib/decorators.py#20%%%../../previewlib/messages.py#15%%%../../previewlib/orm.py#139%%%../../previewlib/config.py#10%%%../../previewlib/__init__.py#16%%%../../previewlib/wsgi.py#15
+Files=../../setup.py#16%%%../../previewlib/decorators.py#20%%%../../previewlib/messages.py#8%%%../../previewlib/orm.py#143%%%../../previewlib/config.py#10%%%../../previewlib/__init__.py#12%%%../../previewlib/wsgi.py#82%%%../../Makefile#5
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
