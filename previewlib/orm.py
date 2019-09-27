@@ -113,10 +113,17 @@ class FileAccessToken(_PreviewModel):
     requested_on = DateTimeField(null=True)
 
     @classmethod
+    def clean_expired(cls):
+        """Deletes rexxpired records."""
+        for record in cls.select().where(cls.valid_until > datetime.now()):
+            record.delete_instance()
+
+    @classmethod
     def from_sha256sum(cls, sha256sum, *, token=None, valid_until=None):
         """Adds entries for the respective
         SHA-256 checksum and returns the record.
         """
+        cls.clean_expired()
         token = token or uuid4()
         valid_until = valid_until or datetime.now() + cls.VALIDITY
         record = cls()
@@ -150,6 +157,7 @@ class FileAccessToken(_PreviewModel):
     @classmethod
     def request(cls, token, sha256sum):
         """Requests the file with the respective ID and token."""
+        cls.clean_expired()
         condition = (cls.token == token) & (cls.sha256sum == sha256sum)
 
         try:
@@ -162,11 +170,7 @@ class FileAccessToken(_PreviewModel):
         if record.valid_until < now:
             raise UNAUTHORIZED
 
-        if record.requested_on is not None:
-            raise UNAUTHORIZED
-
-        record.requested_on = now
-        record.save()
+        record.delete_instance()
 
         try:
             return get(record.sha256sum)
