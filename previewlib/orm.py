@@ -170,8 +170,6 @@ class FileAccessToken(_PreviewModel):
         if record.valid_until < now:
             raise UNAUTHORIZED
 
-        record.delete_instance()
-
         try:
             return get(record.sha256sum)
         except FileError:
