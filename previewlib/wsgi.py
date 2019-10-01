@@ -5,7 +5,7 @@ from uuid import UUID
 from flask import request
 
 from his import authenticated, authorized, Application
-from wsgilib import JSON
+from wsgilib import Binary, JSON
 
 from previewlib.messages import UNAUTHORIZED
 from previewlib.messages import INVALID_TOKEN_TYPE
@@ -90,7 +90,8 @@ def get_file(sha256sum):
     except (KeyError, ValueError):
         return UNAUTHORIZED
 
-    return FileAccessToken.request(token, sha256sum)
+    bytes_ = FileAccessToken.request(token, sha256sum)
+    return Binary(bytes_)
 
 
 APPLICATION.add_routes((
