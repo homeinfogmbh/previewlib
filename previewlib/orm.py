@@ -1,6 +1,7 @@
 """Object-relational mappings."""
 
 from datetime import datetime, timedelta
+from logging import getLogger
 from uuid import uuid4
 
 from peewee import DateTimeField, FixedCharField, ForeignKeyField, UUIDField
@@ -25,6 +26,7 @@ __all__ = [
 
 
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
+LOGGER = getLogger('previewlib')
 
 
 class _PreviewModel(JSONModel):
@@ -151,7 +153,18 @@ class FileAccessToken(_PreviewModel):
         """Returns a response headers for the
         respective presentation object.
         """
-        sha256sums = {File[file].sha256sum for file in presentation.files}
+        sha256sums = set()
+
+        for file in presentation.files:
+            try:
+                sha256sum = File[file].sha256sum
+            except File.DoesNotExist:
+                LOGGER.warning('File %i does not exist in hisfs.', file)
+            except FileError:
+                LOGGER.warning('File %i does not exist in filedb.', file)
+            else:
+                sha256sum.add(sha256sum)
+
         return cls.token_for_sha256sums(sha256sums)
 
     @classmethod
