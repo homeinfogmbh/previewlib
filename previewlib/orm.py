@@ -163,7 +163,7 @@ class FileAccessToken(_PreviewModel):
             except FileError:
                 LOGGER.warning('File %i does not exist in filedb.', file)
             else:
-                sha256sum.add(sha256sum)
+                sha256sums.add(sha256sum)
 
         return cls.token_for_sha256sums(sha256sums)
 
