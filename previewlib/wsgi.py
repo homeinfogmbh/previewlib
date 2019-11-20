@@ -5,6 +5,7 @@ from uuid import UUID
 from flask import request
 
 from his import authenticated, authorized, Application
+from hisfs import FileStream
 from wsgilib import Binary, JSON
 
 from previewlib.messages import UNAUTHORIZED
@@ -90,8 +91,12 @@ def get_file(sha256sum):
     except (KeyError, ValueError):
         return UNAUTHORIZED
 
-    bytes_ = FileAccessToken.request(token, sha256sum)
-    return Binary(bytes_)
+    file = FileAccessToken.request(token, sha256sum)
+
+    if 'stream' in request.args:
+        return FileStream.from_request_args(file)
+
+    return Binary(file.bytes)
 
 
 APPLICATION.add_routes((

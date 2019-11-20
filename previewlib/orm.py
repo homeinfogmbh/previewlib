@@ -7,9 +7,9 @@ from uuid import uuid4
 from peewee import DateTimeField, FixedCharField, ForeignKeyField, UUIDField
 
 from cmslib.orm.group import Group
-from filedb import FileError, get
+from filedb import File as FileDBFile
 from his import CUSTOMER
-from hisfs import File
+from hisfs import File as HISFSFile
 from peeweeplus import JSONModel, MySQLDatabase
 from terminallib import Deployment
 
@@ -157,10 +157,10 @@ class FileAccessToken(_PreviewModel):
 
         for file in presentation.files:
             try:
-                sha256sum = File[file].sha256sum
-            except File.DoesNotExist:
+                sha256sum = HISFSFile[file].sha256sum
+            except HISFSFile.DoesNotExist:
                 LOGGER.warning('File %i does not exist in hisfs.', file)
-            except FileError:
+            except FileDBFile.DoesNotExist:
                 LOGGER.warning('File %i does not exist in filedb.', file)
             else:
                 sha256sums.add(sha256sum)
@@ -184,8 +184,8 @@ class FileAccessToken(_PreviewModel):
             raise UNAUTHORIZED
 
         try:
-            return get(record.sha256sum)
-        except FileError:
+            return FileDBFile.get(FileDBFile.sha256sum == record.sha256sum)
+        except FileDBFile.DoesNotExist:
             raise FILEDB_ERROR
 
 
