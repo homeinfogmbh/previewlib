@@ -4,7 +4,7 @@ from uuid import UUID
 
 from flask import request
 
-from filedb import FileStream
+from filedb import stream
 from his import authenticated, authorized, Application
 from wsgilib import Binary, JSON
 
@@ -94,7 +94,7 @@ def get_file(sha256sum):
     file = FileAccessToken.request(token, sha256sum)
 
     if 'stream' in request.args:
-        return FileStream.from_request_args(file)
+        return stream(file)
 
     return Binary(file.bytes)
 
