@@ -4,8 +4,8 @@ from uuid import UUID
 
 from flask import request
 
+from filedb import FileStream
 from his import authenticated, authorized, Application
-from hisfs import FileStream
 from wsgilib import Binary, JSON
 
 from previewlib.messages import UNAUTHORIZED
