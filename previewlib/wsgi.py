@@ -94,7 +94,7 @@ def get_file(sha256sum):
     file = FileAccessToken.request(token, sha256sum)
 
     if 'stream' in request.args:
-        return stream(file)
+        return file.stream()
 
     return Binary(file.bytes)
 
