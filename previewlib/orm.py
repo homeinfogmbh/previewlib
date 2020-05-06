@@ -176,7 +176,7 @@ class FileAccessToken(_PreviewModel):
             raise UNAUTHORIZED
 
         try:
-            return File.get(File.sha256sum == record.sha256sum)
+            return File.by_sha256sum(record.sha256sum)
         except File.DoesNotExist:
             raise FILEDB_ERROR
 
