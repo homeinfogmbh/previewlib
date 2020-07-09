@@ -9,8 +9,8 @@ from peewee import DateTimeField, FixedCharField, ForeignKeyField, UUIDField
 from cmslib.orm.group import Group
 from filedb import File
 from his import CUSTOMER
+from hwdb import Deployment
 from peeweeplus import JSONModel, MySQLDatabase
-from terminallib import Deployment
 
 from previewlib.config import CONFIG
 from previewlib.messages import FILEDB_ERROR, NO_SUCH_OBJECT, UNAUTHORIZED
