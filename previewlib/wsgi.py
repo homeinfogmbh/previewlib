@@ -1,11 +1,13 @@
 """WSGI interface."""
 
+from typing import Union
 from uuid import UUID
 
 from flask import request
 
 from his import authenticated, authorized, Application
-from wsgilib import Binary, JSON
+from hwdb import Deployment, SmartTV
+from wsgilib import Binary, JSON, JSONMessage, get_int
 
 from previewlib.messages import UNAUTHORIZED
 from previewlib.messages import INVALID_TOKEN_TYPE
@@ -13,7 +15,7 @@ from previewlib.messages import MISSING_TOKEN_TYPE
 from previewlib.messages import MISSING_IDENTIFIER
 from previewlib.messages import NO_SUCH_TOKEN
 from previewlib.messages import TOKEN_DELETED
-from previewlib.orm import TOKEN_TYPES, FileAccessToken
+from previewlib.orm import TOKEN_TYPES, DeploymentPreviewToken, FileAccessToken
 
 
 __all__ = ['APPLICATION']
@@ -24,7 +26,7 @@ APPLICATION = Application('preview')
 
 @authenticated
 @authorized('preview')
-def list_(type):    # pylint: disable=W0622
+def list_(type) -> Union[JSON, JSONMessage]:    # pylint: disable=W0622
     """Lists the customer's preview tokens."""
 
     try:
@@ -37,7 +39,7 @@ def list_(type):    # pylint: disable=W0622
 
 @authenticated
 @authorized('preview')
-def generate():
+def generate() -> Union[JSON, JSONMessage]:
     """Generates a preview token of the
     specified type for the provided ID.
     """
@@ -65,7 +67,7 @@ def generate():
 
 @authenticated
 @authorized('preview')
-def delete(type, ident):    # pylint: disable=W0622
+def delete(type, ident) -> JSONMessage:     # pylint: disable=W0622
     """Deletes a preview token."""
 
     try:
@@ -82,7 +84,7 @@ def delete(type, ident):    # pylint: disable=W0622
     return TOKEN_DELETED
 
 
-def get_file(sha256sum):
+def get_file(sha256sum) -> Binary:
     """Returns a deployment-related file."""
 
     try:
@@ -98,9 +100,26 @@ def get_file(sha256sum):
     return Binary(file.bytes)
 
 
+def generate_for_smart_tv() -> Union[JSON, JSONMessage]:
+    """Generates a deployment preview token for a legacy E-TV."""
+
+    condition = Deployment.customer == get_int('knr')
+    condition &= SmartTV.id == get_int('monitorid')
+
+    try:
+        smart_tv = SmartTV.select(cascade=True).where(condition).get()
+    except SmartTV.DoesNotExist:
+        return JSONMessage('No such SmartTV', status=404)
+
+    token = DeploymentPreviewToken.generate(smart_tv.deployment.id)
+    token.save()
+    return JSON({'token': token.token.hex})
+
+
 APPLICATION.add_routes((
     ('GET', '/token/<type>', list_),
     ('POST', '/token', generate),
     ('DELETE', '/token/<type>/<int:ident>', delete),
-    ('GET', '/file/<sha256sum>', get_file)
+    ('GET', '/file/<sha256sum>', get_file),
+    ('GET', '/smarttv', generate_for_smart_tv)
 ))
