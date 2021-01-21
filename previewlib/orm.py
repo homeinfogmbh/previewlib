@@ -155,7 +155,7 @@ class FileAccessToken(_PreviewModel):
         sha256sums = set()
 
         for file in presentation.files:
-            sha256sums.add(file.metadata.sha256sum)
+            sha256sums.add(file.sha256sum)
 
         return cls.token_for_sha256sums(sha256sums)
 
