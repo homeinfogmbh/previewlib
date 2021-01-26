@@ -130,5 +130,5 @@ APPLICATION.add_routes((
     ('POST', '/token', generate),
     ('DELETE', '/token/<type>/<int:ident>', delete),
     ('GET', '/file/<sha256sum>', get_file),
-    ('POST', '/smarttv', generate_for_smart_tv)
+    ('POST', '/smart-tv', generate_for_smart_tv)
 ))
