@@ -7,7 +7,7 @@ from flask import request
 
 from his import authenticated, authorized, Application
 from hwdb import Deployment, SmartTV
-from wsgilib import Binary, JSON, JSONMessage, get_int
+from wsgilib import Binary, JSON, JSONMessage
 
 from previewlib.messages import UNAUTHORIZED
 from previewlib.messages import INVALID_TOKEN_TYPE
@@ -103,13 +103,22 @@ def get_file(sha256sum) -> Binary:
 def generate_for_smart_tv() -> Union[JSON, JSONMessage]:
     """Generates a deployment preview token for a legacy E-TV."""
 
-    condition = Deployment.customer == get_int('knr')
-    condition &= SmartTV.id == get_int('monitorid')
+    try:
+        customer = request.json['customer']
+    except KeyError:
+        return JSONMessage('No customer specified.', status=400)
+
+    try:
+        ident = request.json['id']
+    except KeyError:
+        return JSONMessage('No ID specified.', status=400)
+
+    condition = (Deployment.customer == customer) & (SmartTV.id == ident)
 
     try:
         smart_tv = SmartTV.select(cascade=True).where(condition).get()
     except SmartTV.DoesNotExist:
-        return JSONMessage('No such SmartTV', status=404)
+        return JSONMessage('No such SmartTV.', status=404)
 
     token = DeploymentPreviewToken.generate(smart_tv.deployment.id)
     token.save()
@@ -121,5 +130,5 @@ APPLICATION.add_routes((
     ('POST', '/token', generate),
     ('DELETE', '/token/<type>/<int:ident>', delete),
     ('GET', '/file/<sha256sum>', get_file),
-    ('GET', '/smarttv', generate_for_smart_tv)
+    ('POST', '/smarttv', generate_for_smart_tv)
 ))
