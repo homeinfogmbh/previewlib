@@ -5,7 +5,7 @@ from uuid import UUID
 
 from flask import request
 
-from his import authenticated, authorized, Application
+from his import CUSTOMER, authenticated, authorized, Application
 from hwdb import Deployment, SmartTV
 from wsgilib import Binary, JSON, JSONMessage
 
@@ -30,11 +30,11 @@ def list_(type) -> Union[JSON, JSONMessage]:    # pylint: disable=W0622
     """Lists the customer's preview tokens."""
 
     try:
-        token_class = TOKEN_TYPES[type]
+        cls = TOKEN_TYPES[type]
     except KeyError:
         return INVALID_TOKEN_TYPE
 
-    return JSON([token.to_json() for token in token_class.for_customer()])
+    return JSON([token.to_json() for token in cls.for_customer(CUSTOMER.id)])
 
 
 @authenticated
@@ -60,7 +60,7 @@ def generate() -> Union[JSON, JSONMessage]:
         return INVALID_TOKEN_TYPE
 
     force = request.json.get('force', False)
-    token = token_class.generate(ident, force=force)
+    token = token_class.generate(ident, CUSTOMER.id, force=force)
     token.save()
     return JSON({'token': token.token.hex})
 
@@ -76,7 +76,7 @@ def delete(type, ident) -> JSONMessage:     # pylint: disable=W0622
         return INVALID_TOKEN_TYPE
 
     try:
-        token = token_class.by_id(ident)
+        token = token_class.by_id(ident, CUSTOMER.id)
     except token_class.DoesNotExist:
         return NO_SUCH_TOKEN
 
@@ -120,7 +120,8 @@ def generate_for_smart_tv() -> Union[JSON, JSONMessage]:
     except SmartTV.DoesNotExist:
         return JSONMessage('No such SmartTV.', status=404)
 
-    token = DeploymentPreviewToken.generate(smart_tv.deployment.id)
+    token = DeploymentPreviewToken.generate(
+        smart_tv.deployment.id, smart_tv.deployment.customer)
     token.save()
     return JSON({'token': token.token.hex})
 
