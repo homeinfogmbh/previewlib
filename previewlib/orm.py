@@ -12,7 +12,7 @@ from peewee import ForeignKeyField
 from peewee import ModelSelect
 from peewee import UUIDField
 
-from cmslib.orm.group import Group
+from cmslib import Group
 from filedb import File
 from hwdb import Deployment
 from mdb import Customer
