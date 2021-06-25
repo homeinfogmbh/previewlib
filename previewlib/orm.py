@@ -34,7 +34,7 @@ DATABASE = MySQLDatabase.from_config(CONFIG['db'])
 LOGGER = getLogger('previewlib')
 
 
-class PreviewModel(JSONModel):
+class PreviewModel(JSONModel):  # pylint: disable=R0903
     """Common base model."""
 
     class Meta:     # pylint: disable=C0111,R0903
