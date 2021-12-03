@@ -16,9 +16,8 @@ from cmslib import Group
 from filedb import File
 from hwdb import Deployment
 from mdb import Customer
-from peeweeplus import JSONModel, MySQLDatabase
+from peeweeplus import JSONModel, MySQLDatabaseProxy
 
-from previewlib.config import CONFIG
 from previewlib.messages import FILEDB_ERROR, NO_SUCH_OBJECT, UNAUTHORIZED
 
 
@@ -30,7 +29,7 @@ __all__ = [
 ]
 
 
-DATABASE = MySQLDatabase.from_config(CONFIG['db'])
+DATABASE = MySQLDatabaseProxy('configlib')
 LOGGER = getLogger('previewlib')
 
 
