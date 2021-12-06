@@ -29,7 +29,7 @@ __all__ = [
 ]
 
 
-DATABASE = MySQLDatabaseProxy('configlib')
+DATABASE = MySQLDatabaseProxy('previewlib')
 LOGGER = getLogger('previewlib')
 
 
