@@ -26,7 +26,7 @@ APPLICATION = Application('preview')
 
 @authenticated
 @authorized('preview')
-def list_(type) -> Union[JSON, JSONMessage]:    # pylint: disable=W0622
+def list_(type: str) -> Union[JSON, JSONMessage]:    # pylint: disable=W0622
     """Lists the customer's preview tokens."""
 
     try:
@@ -67,7 +67,7 @@ def generate() -> Union[JSON, JSONMessage]:
 
 @authenticated
 @authorized('preview')
-def delete(type, ident) -> JSONMessage:     # pylint: disable=W0622
+def delete(type: str, ident: int) -> JSONMessage:     # pylint: disable=W0622
     """Deletes a preview token."""
 
     try:
@@ -84,7 +84,7 @@ def delete(type, ident) -> JSONMessage:     # pylint: disable=W0622
     return TOKEN_DELETED
 
 
-def get_file(sha256sum) -> Binary:
+def get_file(sha256sum: str) -> Binary:
     """Returns a deployment-related file."""
 
     try:

@@ -1,25 +1,27 @@
 """Decorator functions."""
 
 from functools import wraps
+from typing import Any, Callable, Type
 
 from flask import request
 
 from hisfs import File
 
 from previewlib.messages import UNAUTHORIZED
+from previewlib.orm import PreviewToken
 
 
 __all__ = ['preview', 'file_preview']
 
 
-def preview(token_class):
+def preview(token_class: Type[PreviewToken]) -> Callable[[Callable], Callable]:
     """Decorator to secure a WSGI function with a preview token."""
 
-    def decorator(function):
+    def decorator(function: Callable) -> Callable:
         """Decorator so secure the respective function."""
 
         @wraps(function)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             """Receives a token and arguments for the original function."""
             try:
                 token = token_class.get(
@@ -34,10 +36,10 @@ def preview(token_class):
     return decorator
 
 
-def file_preview(presentation_class):
+def file_preview(presentation_class: Any) -> Callable[[Callable], Callable]:
     """Decorator to secure a WSGI function with a preview token."""
 
-    def decorator(function):
+    def decorator(function: Callable) -> Callable:
         """Decorator so secure the respective function."""
 
         @wraps(function)

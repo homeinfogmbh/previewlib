@@ -23,6 +23,7 @@ from previewlib.messages import FILEDB_ERROR, NO_SUCH_OBJECT, UNAUTHORIZED
 
 __all__ = [
     'TOKEN_TYPES',
+    'PreviewToken',
     'DeploymentPreviewToken',
     'GroupPreviewToken',
     'FileAccessToken'
