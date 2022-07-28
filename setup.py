@@ -10,7 +10,18 @@ setup(
     author_email='<info at homeinfo dot de>',
     maintainer='Richard Neumann',
     maintainer_email='<r dot neumann at homeinfo period de>',
-    requires=['mdb', 'peewee', 'peeweeplus'],
+    requires=[
+        'cmslib',
+        'filedb',
+        'flask',
+        'his',
+        'hisfs',
+        'hwdb',
+        'mdb',
+        'peewee',
+        'peeweeplus',
+        'wsgilib'
+    ],
     packages=['previewlib'],
     description='HOMEINFO preview library.'
 )
