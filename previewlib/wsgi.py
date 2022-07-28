@@ -3,7 +3,7 @@
 from typing import Union
 from uuid import UUID
 
-from flask import request
+from flask import Response, request
 
 from his import CUSTOMER, authenticated, authorized, Application
 from hwdb import Deployment, SmartTV
@@ -84,7 +84,7 @@ def delete(type: str, ident: int) -> JSONMessage:
     return TOKEN_DELETED
 
 
-def get_file(sha256sum: str) -> Binary:
+def get_file(sha256sum: str) -> Union[Binary, Response]:
     """Returns a deployment-related file."""
 
     try:
@@ -126,10 +126,10 @@ def generate_for_smart_tv() -> Union[JSON, JSONMessage]:
     return JSON({'token': token.token.hex})
 
 
-APPLICATION.add_routes((
+APPLICATION.add_routes([
     ('GET', '/token/<type>', list_),
     ('POST', '/token', generate),
     ('DELETE', '/token/<type>/<int:ident>', delete),
     ('GET', '/file/<sha256sum>', get_file),
     ('POST', '/smart-tv', generate_for_smart_tv)
-))
+])
