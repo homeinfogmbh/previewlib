@@ -49,8 +49,11 @@ class PreviewToken(PreviewModel):
     obj = None
 
     @classmethod
-    def _get_rel_record(cls, ident: int, customer: Union[Customer, int]) \
-            -> PreviewToken:
+    def _get_rel_record(
+            cls,
+            ident: int,
+            customer: Union[Customer, int]
+    ) -> PreviewToken:
         """Returns a related object by its ID."""
         model = cls.obj.rel_model
         condition = model.id == ident
@@ -62,8 +65,13 @@ class PreviewToken(PreviewModel):
             raise NO_SUCH_OBJECT.update(type=model.__name__) from None
 
     @classmethod
-    def generate(cls, ident: int, customer: Union[Customer, int], *,
-                 force: bool = False) -> PreviewToken:
+    def generate(
+            cls,
+            ident: int,
+            customer: Union[Customer, int],
+            *,
+            force: bool = False
+    ) -> PreviewToken:
         """Returns a token for the respective resource."""
         rel_record = cls._get_rel_record(ident, customer)
 
@@ -97,7 +105,8 @@ class DeploymentPreviewToken(PreviewToken):
         table_name = 'deployment_preview_token'
 
     obj = ForeignKeyField(
-        Deployment, column_name='deployment', on_delete='CASCADE')
+        Deployment, column_name='deployment', on_delete='CASCADE'
+    )
 
 
 class GroupPreviewToken(PreviewToken):
@@ -129,9 +138,13 @@ class FileAccessToken(PreviewModel):
             record.delete_instance()
 
     @classmethod
-    def from_sha256sum(cls, sha256sum: str, *, token: Optional[UUID] = None,
-                       valid_until: Optional[datetime] = None) \
-            -> FileAccessToken:
+    def from_sha256sum(
+            cls,
+            sha256sum: str,
+            *,
+            token: Optional[UUID] = None,
+            valid_until: Optional[datetime] = None
+    ) -> FileAccessToken:
         """Adds entries for the respective
         SHA-256 checksum and returns the record.
         """

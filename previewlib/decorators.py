@@ -25,7 +25,8 @@ def preview(token_class: Type[PreviewToken]) -> Callable[[Callable], Callable]:
             """Receives a token and arguments for the original function."""
             try:
                 token = token_class.get(
-                    token_class.token == request.args.get('token'))
+                    token_class.token == request.args.get('token')
+                )
             except token_class.DoesNotExist:
                 raise UNAUTHORIZED
 
@@ -50,7 +51,8 @@ def file_preview(presentation_class: Any) -> Callable[[Callable], Callable]:
             if ident in presentation.files:
                 file = File.get(
                     (File.id == ident)
-                    & (File.customer == presentation.customer))
+                    & (File.customer == presentation.customer)
+                )
                 return function(file, *args, **kwargs)
 
             raise UNAUTHORIZED.update(files=list(presentation.files))
