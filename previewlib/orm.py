@@ -34,10 +34,10 @@ DATABASE = MySQLDatabaseProxy('previewlib')
 LOGGER = getLogger('previewlib')
 
 
-class PreviewModel(JSONModel):  # pylint: disable=R0903
+class PreviewModel(JSONModel):
     """Common base model."""
 
-    class Meta:     # pylint: disable=C0111,R0903
+    class Meta:
         database = DATABASE
         schema = database.database
 
@@ -93,7 +93,7 @@ class PreviewToken(PreviewModel):
 class DeploymentPreviewToken(PreviewToken):
     """Preview tokens for deployments."""
 
-    class Meta:     # pylint: disable=C0111,R0903
+    class Meta:
         table_name = 'deployment_preview_token'
 
     obj = ForeignKeyField(
@@ -103,7 +103,7 @@ class DeploymentPreviewToken(PreviewToken):
 class GroupPreviewToken(PreviewToken):
     """Preview tokens for groups."""
 
-    class Meta:     # pylint: disable=C0111,R0903
+    class Meta:
         table_name = 'group_preview_token'
 
     obj = ForeignKeyField(Group, column_name='group', on_delete='CASCADE')
@@ -114,7 +114,7 @@ class FileAccessToken(PreviewModel):
 
     VALIDITY = timedelta(minutes=5)
 
-    class Meta:     # pylint: disable=C0111,R0903
+    class Meta:
         table_name = 'file_access_token'
 
     token = UUIDField()
