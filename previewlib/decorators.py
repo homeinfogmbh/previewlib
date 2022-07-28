@@ -5,6 +5,7 @@ from typing import Any, Callable, Type
 
 from flask import request
 
+from cmslib import Presentation
 from hisfs import File
 
 from previewlib.messages import UNAUTHORIZED
@@ -37,14 +38,16 @@ def preview(token_class: Type[PreviewToken]) -> Callable[[Callable], Callable]:
     return decorator
 
 
-def file_preview(presentation_class: Any) -> Callable[[Callable], Callable]:
+def file_preview(
+        presentation_class: Type[Presentation]
+) -> Callable[[Callable], Callable]:
     """Decorator to secure a WSGI function with a preview token."""
 
     def decorator(function: Callable) -> Callable:
         """Decorator so secure the respective function."""
 
         @wraps(function)
-        def wrapper(obj, ident, *args, **kwargs):
+        def wrapper(obj, ident, *args, **kwargs) -> Any:
             """Receives a token and arguments for the original function."""
             presentation = presentation_class(obj)
 
