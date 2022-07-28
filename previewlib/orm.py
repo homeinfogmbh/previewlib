@@ -124,7 +124,7 @@ class FileAccessToken(PreviewModel):
 
     @classmethod
     def clean_expired(cls) -> None:
-        """Deletes rexxpired records."""
+        """Deletes expired records."""
         for record in cls.select().where(cls.valid_until < datetime.now()):
             record.delete_instance()
 
