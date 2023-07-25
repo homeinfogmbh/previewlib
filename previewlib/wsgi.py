@@ -18,14 +18,14 @@ from previewlib.messages import TOKEN_DELETED
 from previewlib.orm import TOKEN_TYPES, DeploymentPreviewToken, FileAccessToken
 
 
-__all__ = ['APPLICATION']
+__all__ = ["APPLICATION"]
 
 
-APPLICATION = Application('preview')
+APPLICATION = Application("preview")
 
 
 @authenticated
-@authorized('preview')
+@authorized("preview")
 def list_(type: str) -> Union[JSON, JSONMessage]:
     """Lists the customer's preview tokens."""
 
@@ -38,18 +38,18 @@ def list_(type: str) -> Union[JSON, JSONMessage]:
 
 
 @authenticated
-@authorized('preview')
+@authorized("preview")
 def generate() -> Union[JSON, JSONMessage]:
     """Generates a preview token of the
     specified type for the provided ID.
     """
 
-    type_ = request.json.get('type')
+    type_ = request.json.get("type")
 
     if not type_:
         return MISSING_TOKEN_TYPE
 
-    ident = request.json.get('id')
+    ident = request.json.get("id")
 
     if not ident:
         return MISSING_IDENTIFIER
@@ -59,14 +59,14 @@ def generate() -> Union[JSON, JSONMessage]:
     except KeyError:
         return INVALID_TOKEN_TYPE
 
-    force = request.json.get('force', False)
+    force = request.json.get("force", False)
     token = token_class.generate(ident, CUSTOMER.id, force=force)
     token.save()
-    return JSON({'token': token.token.hex})
+    return JSON({"token": token.token.hex})
 
 
 @authenticated
-@authorized('preview')
+@authorized("preview")
 def delete(type: str, ident: int) -> JSONMessage:
     """Deletes a preview token."""
 
@@ -88,13 +88,13 @@ def get_file(sha256sum: str) -> Union[Binary, Response]:
     """Returns a deployment-related file."""
 
     try:
-        token = UUID(request.args['token'])
+        token = UUID(request.args["token"])
     except (KeyError, ValueError):
         return UNAUTHORIZED
 
     file = FileAccessToken.request(token, sha256sum)
 
-    if 'stream' in request.args:
+    if "stream" in request.args:
         return file.stream()
 
     return Binary(file.bytes)
@@ -104,32 +104,35 @@ def generate_for_smart_tv() -> Union[JSON, JSONMessage]:
     """Generates a deployment preview token for a legacy E-TV."""
 
     try:
-        customer = request.json['customer']
+        customer = request.json["customer"]
     except KeyError:
-        return JSONMessage('No customer specified.', status=400)
+        return JSONMessage("No customer specified.", status=400)
 
     try:
-        ident = request.json['id']
+        ident = request.json["id"]
     except KeyError:
-        return JSONMessage('No ID specified.', status=400)
+        return JSONMessage("No ID specified.", status=400)
 
     condition = (Deployment.customer == customer) & (SmartTV.id == ident)
 
     try:
         smart_tv = SmartTV.select(cascade=True).where(condition).get()
     except SmartTV.DoesNotExist:
-        return JSONMessage('No such SmartTV.', status=404)
+        return JSONMessage("No such SmartTV.", status=404)
 
     token = DeploymentPreviewToken.generate(
-        smart_tv.deployment.id, smart_tv.deployment.customer)
+        smart_tv.deployment.id, smart_tv.deployment.customer
+    )
     token.save()
-    return JSON({'token': token.token.hex})
+    return JSON({"token": token.token.hex})
 
 
-APPLICATION.add_routes([
-    ('GET', '/token/<type>', list_),
-    ('POST', '/token', generate),
-    ('DELETE', '/token/<type>/<int:ident>', delete),
-    ('GET', '/file/<sha256sum>', get_file),
-    ('POST', '/smart-tv', generate_for_smart_tv)
-])
+APPLICATION.add_routes(
+    [
+        ("GET", "/token/<type>", list_),
+        ("POST", "/token", generate),
+        ("DELETE", "/token/<type>/<int:ident>", delete),
+        ("GET", "/file/<sha256sum>", get_file),
+        ("POST", "/smart-tv", generate_for_smart_tv),
+    ]
+)

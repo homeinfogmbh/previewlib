@@ -8,7 +8,7 @@ from wsgilib import ACCEPT, JSON, JSONMessage, XML
 from previewlib.orm import FileAccessToken
 
 
-__all__ = ['Response', 'make_response']
+__all__ = ["Response", "make_response"]
 
 
 Response = Union[JSON, JSONMessage, XML]
@@ -19,14 +19,14 @@ def make_response(presentation: Presentation) -> Response:
 
     file_preview_token = FileAccessToken.token_for_presentation(presentation)
 
-    if 'application/xml' in ACCEPT or '*/*' in ACCEPT:
+    if "application/xml" in ACCEPT or "*/*" in ACCEPT:
         presentation = presentation.to_dom()
         presentation.file_preview_token = file_preview_token.hex
         return XML(presentation)
 
-    if 'application/json' in ACCEPT:
+    if "application/json" in ACCEPT:
         json = presentation.to_json()
-        json['filePreviewToken'] = file_preview_token.hex
+        json["filePreviewToken"] = file_preview_token.hex
         return JSON(json)
 
-    return JSONMessage('Invalid content type.', status=400)
+    return JSONMessage("Invalid content type.", status=400)

@@ -22,16 +22,16 @@ from previewlib.messages import FILEDB_ERROR, NO_SUCH_OBJECT, UNAUTHORIZED
 
 
 __all__ = [
-    'TOKEN_TYPES',
-    'PreviewToken',
-    'DeploymentPreviewToken',
-    'GroupPreviewToken',
-    'FileAccessToken'
+    "TOKEN_TYPES",
+    "PreviewToken",
+    "DeploymentPreviewToken",
+    "GroupPreviewToken",
+    "FileAccessToken",
 ]
 
 
-DATABASE = MySQLDatabaseProxy('previewlib')
-LOGGER = getLogger('previewlib')
+DATABASE = MySQLDatabaseProxy("previewlib")
+LOGGER = getLogger("previewlib")
 
 
 class PreviewModel(JSONModel):
@@ -50,9 +50,7 @@ class PreviewToken(PreviewModel):
 
     @classmethod
     def _get_rel_record(
-            cls,
-            ident: int,
-            customer: Union[Customer, int]
+        cls, ident: int, customer: Union[Customer, int]
     ) -> PreviewToken:
         """Returns a related object by its ID."""
         model = cls.obj.rel_model
@@ -66,11 +64,7 @@ class PreviewToken(PreviewModel):
 
     @classmethod
     def generate(
-            cls,
-            ident: int,
-            customer: Union[Customer, int],
-            *,
-            force: bool = False
+        cls, ident: int, customer: Union[Customer, int], *, force: bool = False
     ) -> PreviewToken:
         """Returns a token for the respective resource."""
         rel_record = cls._get_rel_record(ident, customer)
@@ -102,20 +96,18 @@ class DeploymentPreviewToken(PreviewToken):
     """Preview tokens for deployments."""
 
     class Meta:
-        table_name = 'deployment_preview_token'
+        table_name = "deployment_preview_token"
 
-    obj = ForeignKeyField(
-        Deployment, column_name='deployment', on_delete='CASCADE'
-    )
+    obj = ForeignKeyField(Deployment, column_name="deployment", on_delete="CASCADE")
 
 
 class GroupPreviewToken(PreviewToken):
     """Preview tokens for groups."""
 
     class Meta:
-        table_name = 'group_preview_token'
+        table_name = "group_preview_token"
 
-    obj = ForeignKeyField(Group, column_name='group', on_delete='CASCADE')
+    obj = ForeignKeyField(Group, column_name="group", on_delete="CASCADE")
 
 
 class FileAccessToken(PreviewModel):
@@ -124,7 +116,7 @@ class FileAccessToken(PreviewModel):
     VALIDITY = timedelta(minutes=5)
 
     class Meta:
-        table_name = 'file_access_token'
+        table_name = "file_access_token"
 
     token = UUIDField()
     sha256sum = FixedCharField(64)
@@ -139,11 +131,11 @@ class FileAccessToken(PreviewModel):
 
     @classmethod
     def from_sha256sum(
-            cls,
-            sha256sum: str,
-            *,
-            token: Optional[UUID] = None,
-            valid_until: Optional[datetime] = None
+        cls,
+        sha256sum: str,
+        *,
+        token: Optional[UUID] = None,
+        valid_until: Optional[datetime] = None,
     ) -> FileAccessToken:
         """Adds entries for the respective
         SHA-256 checksum and returns the record.
@@ -204,7 +196,4 @@ class FileAccessToken(PreviewModel):
             raise FILEDB_ERROR from None
 
 
-TOKEN_TYPES = {
-    'deployment': DeploymentPreviewToken,
-    'group': GroupPreviewToken
-}
+TOKEN_TYPES = {"deployment": DeploymentPreviewToken, "group": GroupPreviewToken}

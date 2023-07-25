@@ -12,7 +12,7 @@ from previewlib.messages import UNAUTHORIZED
 from previewlib.orm import PreviewToken
 
 
-__all__ = ['preview', 'file_preview']
+__all__ = ["preview", "file_preview"]
 
 
 def preview(token_class: Type[PreviewToken]) -> Callable[[Callable], Callable]:
@@ -25,9 +25,7 @@ def preview(token_class: Type[PreviewToken]) -> Callable[[Callable], Callable]:
         def wrapper(*args, **kwargs) -> Any:
             """Receives a token and arguments for the original function."""
             try:
-                token = token_class.get(
-                    token_class.token == request.args.get('token')
-                )
+                token = token_class.get(token_class.token == request.args.get("token"))
             except token_class.DoesNotExist:
                 raise UNAUTHORIZED
 
@@ -39,7 +37,7 @@ def preview(token_class: Type[PreviewToken]) -> Callable[[Callable], Callable]:
 
 
 def file_preview(
-        presentation_class: Type[Presentation]
+    presentation_class: Type[Presentation],
 ) -> Callable[[Callable], Callable]:
     """Decorator to secure a WSGI function with a preview token."""
 
@@ -53,8 +51,7 @@ def file_preview(
 
             if ident in presentation.files:
                 file = File.get(
-                    (File.id == ident)
-                    & (File.customer == presentation.customer)
+                    (File.id == ident) & (File.customer == presentation.customer)
                 )
                 return function(file, *args, **kwargs)
 

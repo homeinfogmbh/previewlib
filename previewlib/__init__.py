@@ -10,13 +10,13 @@ from previewlib.wsgi import APPLICATION
 
 
 __all__ = [
-    'APPLICATION',
-    'TOKEN_TYPES',
-    'DeploymentPreviewToken',
-    'FileAccessToken',
-    'GroupPreviewToken',
-    'Response',
-    'file_preview',
-    'make_response',
-    'preview'
+    "APPLICATION",
+    "TOKEN_TYPES",
+    "DeploymentPreviewToken",
+    "FileAccessToken",
+    "GroupPreviewToken",
+    "Response",
+    "file_preview",
+    "make_response",
+    "preview",
 ]
